@@ -42,7 +42,7 @@ module.exports = {
         exclude: /node_modules/,
         // to tell webpack what to do with these javascript files.
         // we want to run babel on the files, for which we need babel-loader
-        use: ["babel-loader"]
+        use: ["babel-loader", "eslint-loader"] // these rules are processed bottom to top. first eslint will be loaded next babel is loaded
       },
       {
         test: /(\.css)$/,
