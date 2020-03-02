@@ -25,6 +25,9 @@ module.exports = {
     https: false
   },
   plugins: [
+    new webpack.DefinePlugin({
+      "process.env.API_URL": JSON.stringify("http://localhost:3001")
+    }),
     // it accepts an object to configure our plugin
     new HtmlWebPackPlugin({
       // template is tell the webpack where to find the html template
