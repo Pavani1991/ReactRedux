@@ -3,10 +3,13 @@ import { connect } from "react-redux";
 import * as courseActions from "../../redux/actions/courseActions";
 import * as authorActions from "../../redux/actions/authorActions";
 import PropTypes from "prop-types";
+import Spinner from "../common/Spinner";
+
 // BIND ACTION CREATORS HELP US FROM calling the action creat ort  directorly in the mapDispatchToProps function
 import { bindActionCreators } from "redux";
 import CourseList from "./CourseList";
 import { Redirect } from "react-router-dom";
+import { toast } from "react-toastify";
 
 class CoursesPage extends React.Component {
   // can simplify this using shorter approach
@@ -77,19 +80,37 @@ class CoursesPage extends React.Component {
     }
   }
 
+  handleDeleteCourse = async course => {
+    toast.success("Course deleted");
+    try {
+      await this.props.actions.deleteCourse(course);
+    } catch (error) {
+      toast.error("Delete Failed. " + error.message, { autoClose: false });
+    }
+  };
+
   render() {
     return (
       <>
         {this.state.redirectToAddCoursePage && <Redirect to="/course" />}
         <h2> Courses</h2>
-        <button
-          style={{ marginBottom: 20 }}
-          className="btn btn-primary add-course"
-          onClick={() => this.setState({ redirectToAddCoursePage: true })}
-        >
-          Add Course
-        </button>
-        <CourseList courses={this.props.courses} />
+        {this.props.loading ? (
+          <Spinner />
+        ) : (
+          <>
+            <button
+              style={{ marginBottom: 20 }}
+              className="btn btn-primary add-course"
+              onClick={() => this.setState({ redirectToAddCoursePage: true })}
+            >
+              Add Course
+            </button>
+            <CourseList
+              courses={this.props.courses}
+              onDeleteClick={this.handleDeleteCourse}
+            />
+          </>
+        )}
       </>
     );
   }
@@ -98,11 +119,12 @@ class CoursesPage extends React.Component {
 CoursesPage.propTypes = {
   actions: PropTypes.object.isRequired,
   courses: PropTypes.array.isRequired,
-  authors: PropTypes.array.isRequired
+  authors: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired
 };
 
 function mapStateToProps(state) {
-  console.log("In map state");
+  console.log("In map state" + state.apiCallsInProgress);
   return {
     courses:
       state.authors.length === 0
@@ -113,7 +135,8 @@ function mapStateToProps(state) {
               authorName: state.authors.find(a => a.id == course.authorId).name
             };
           }),
-    authors: state.authors
+    authors: state.authors,
+    loading: state.apiCallsInProgress > 0
   };
 }
 
@@ -125,7 +148,8 @@ function mapDispatchToProps(dispatch) {
     // when all the actions are passed then it return then all wrapped
     actions: {
       loadCourses: bindActionCreators(courseActions.loadCourses, dispatch), // this will wrap all the course action in the dispatch
-      loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch)
+      loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch),
+      deleteCourse: bindActionCreators(courseActions.deleteCourse, dispatch)
     }
     // createCourse: course => dispatch(courseActions.createCourse(course))
   };
