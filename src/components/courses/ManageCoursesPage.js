@@ -8,7 +8,7 @@ import CourseForm from "./CourseForm";
 import Spinner from "../common/Spinner";
 import { toast } from "react-toastify";
 
-function ManageCoursesPage({
+export function ManageCoursesPage({
   authors,
   courses,
   loadAuthors,
@@ -51,9 +51,9 @@ function ManageCoursesPage({
   function formIsValid() {
     const { title, authorId, category } = course;
     const errors = {};
-    if (!title) errors.title = "Title is required";
-    if (!authorId) errors.author = "Author is required";
-    if (!category) errors.category = "Category is required";
+    if (!title) errors.title = "Title is required.";
+    if (!authorId) errors.author = "Author is required.";
+    if (!category) errors.category = "Category is required.";
     setErrors(errors);
     return Object.keys(errors).length === 0;
   }
